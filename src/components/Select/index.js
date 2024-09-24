@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useState } from "react";
 import PropTypes from "prop-types";
 
@@ -13,42 +11,36 @@ const Select = ({
   label,
   type = "normal",
 }) => {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState(null);
   const [collapsed, setCollapsed] = useState(true);
+
   const changeValue = (newValue) => {
-    onChange();
     setValue(newValue);
-    setCollapsed(newValue);
+    setCollapsed(true);
+    onChange(newValue);
   };
+
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
       {label && <div className="label">{label}</div>}
       <div className="Select">
-        <ul>
-          <li className={collapsed ? "SelectTitle--show" : "SelectTitle--hide"}>
-            {value || (!titleEmpty && "Toutes")}
+            <ul>
+        {!titleEmpty && (
+          <li>
+            <button type="button" onClick={() => changeValue(null)}>
+              <input defaultChecked={!value} name="selected" type="radio" /> Toutes
+            </button>
           </li>
-          {!collapsed && (
-            <>
-              {!titleEmpty && (
-                <li onClick={() => changeValue(null)}>
-                  <input defaultChecked={!value} name="selected" type="radio" />{" "}
-                  Toutes
-                </li>
-              )}
-              {selection.map((s) => (
-                <li key={s} onClick={() => changeValue(s)}>
-                  <input
-                    defaultChecked={value === s}
-                    name="selected"
-                    type="radio"
-                  />{" "}
-                  {s}
-                </li>
-              ))}
-            </>
-          )}
-        </ul>
+        )}
+        {selection.map((s) => (
+          <li key={s}>
+            <button type="button" onClick={() => changeValue(s)}>
+              <input defaultChecked={value === s} name="selected" type="radio" /> {s}
+            </button>
+          </li>
+        ))}
+      </ul>
+
         <input type="hidden" value={value || ""} name={name} />
         <button
           type="button"
@@ -88,7 +80,7 @@ Select.propTypes = {
   titleEmpty: PropTypes.bool,
   label: PropTypes.string,
   type: PropTypes.string,
-}
+};
 
 Select.defaultProps = {
   onChange: () => null,
@@ -96,6 +88,6 @@ Select.defaultProps = {
   label: "",
   type: "normal",
   name: "select",
-}
+};
 
 export default Select;

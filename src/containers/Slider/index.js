@@ -6,11 +6,15 @@ import "./style.scss";
 
 const Slider = () => {
   const { data } = useData();
-  const [index, setIndex] = useState(0);
+  console.log(data)
 
-  // Sort the events by date
-  const byDateAsc = data?.focus.sort((evtA, evtB) =>
-    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
+  if (!data || !data.focus || data.focus.length === 0) {
+    return <div>Chargement des données...</div>;
+  }
+
+  const [index, setIndex] = useState(0);
+  const byDateAsc = data.focus.sort((evtA, evtB) =>
+    new Date(evtA.date) > new Date(evtB.date) ? 1 : -1
   );
 
   const nextCard = () => {
@@ -19,19 +23,18 @@ const Slider = () => {
     );
   };
 
-  // Slide changes every 5 seconds
   useEffect(() => {
     const timer = setTimeout(nextCard, 5000);
-    return () => clearTimeout(timer); // Clean the timer
+    return () => clearTimeout(timer);
   }, [index, byDateAsc.length]);
 
   return (
     <div className="SlideCardList">
-      {byDateAsc?.map((event) => (
+      {byDateAsc.map((event, idx) => (
         <div
-          key={event.id} // Use id as a key
+          key={event.title}
           className={`SlideCard SlideCard--${
-            index === byDateAsc.indexOf(event) ? "display" : "hide"
+            index === idx ? "display" : "hide"
           }`}
         >
           <img src={event.cover} alt="forum" />
@@ -45,20 +48,21 @@ const Slider = () => {
         </div>
       ))}
 
-      {}
-      <div className="SlideCard__paginationContainer">
-        <div className="SlideCard__pagination">
-          {byDateAsc.map((event) => (
-            <input
-              key={event.id}
-              type="radio"
-              name="radio-button"
-              checked={index === byDateAsc.indexOf(event)}
-              onChange={() => setIndex(byDateAsc.indexOf(event))}
-            />
-          ))}
-        </div>
+          {}
+          <div className="SlideCard__paginationContainer">
+      <div className="SlideCard__pagination">
+        {byDateAsc.map((event, radioIdx) => (
+          <input
+            key={event.id}
+            type="radio"
+            name="radio-button"
+            checked={index === radioIdx}
+            onChange={() => setIndex(radioIdx)}
+          />
+        ))}
       </div>
+    </div>
+
     </div>
   );
 };
